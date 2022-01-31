@@ -17,9 +17,9 @@
 проверкам, так что уравнения проверки четности вряд ли будут содержать один и тот же набор битов кодового слова. В
 """
 
-# from LDPC import generator_matrix, check_matrix
+from LDPC import generator_matrix, check_matrix
 from function_for_LDPC import *
-
+"""
 check_matrix = [[1, 1, 0, 1, 0, 0],
                 [0, 1, 1, 0, 1, 0],
                 [1, 0, 0, 0, 1, 1],
@@ -27,8 +27,9 @@ check_matrix = [[1, 1, 0, 1, 0, 0],
 """
 signal = [randint(0, 1) for i in range(len(generator_matrix))]
 code_signal = multiplication_vector_on_matrix(signal[:], generator_matrix[:])
-"""
-code_signal = [0, 0, 1, 0, 1, 1]
+
+# code_signal = [0, 0, 1, 0, 1, 1]
+
 print(code_signal)
 check_matrix_one_position = []
 for i in check_matrix:
@@ -41,7 +42,7 @@ for i in check_matrix:
 print(check_matrix_one_position)
 errors = []
 probability_of_error = 100
-number_of_repetitions = 1
+number_of_repetitions = 1000
 for i in range(probability_of_error):
     counter_error = 0
     for j in range(number_of_repetitions):
@@ -52,19 +53,63 @@ for i in range(probability_of_error):
             if prob < i:
                 copy_code[bit] = (copy_code[bit] + 1) % 2
         # Исправление ошибки
-        # Проверяем линии:
-        line_values = []
-        for line in check_matrix_one_position:
-            line_value = 0
-            for value in line:
-                line_value = (line_value + copy_code[value]) % 2
-            line_values.append(line_value)
-        counter_value = 0
-        for value in line_values:
-            counter_value += counter_value
+        list_of_option = []
+        while True:
+            if copy_code in list_of_option:
+                counter_error += 1
+                break
+            list_of_option.append(copy_code)
+            line_values = []
+            for line in check_matrix_one_position:
+                line_value = 0
+                for value in line:
+                    line_value = (line_value + copy_code[value]) % 2
+                line_values.append(line_value)
+            counter_value = 0
+            for value in line_values:
+                counter_value = counter_value + value
+            # !!!!!!!!!!!!!
+            if counter_value == 0:
+                """
+                if code_signal != copy_code:
+                    print(code_signal)
+                    print(copy_code)
+                    print(line_values)
+                    print(reverse_dict)
+                    print('-------------------')
+                break
+                """
+                if code_signal == copy_code:
+                    break
+                else:
+                    counter_error += 1
+                    break
 
-        # TODO доделать алгоритм, посмотреть спорные варианты, когда меняется 2 бита а четность выполняется,
-        #  продумать это (возможно при тестах сравнивать с исходным значением?) (возможно при больших матрицах
-        #  такого не будет?) алгоритм понятен вроде: смотрим значение узла, если он 0, то оставляем, если он 1, то
-        #  то отсылаем значению обратное значение, тот бит которому прийдут обратные значения меняем и тестируем,
-        #  продумать выход из бесконечного цикла
+            # !!!!!!!!!!!!!
+
+            reverse_dict = dict()
+            for bit in range(len(copy_code)):
+                reverse_dict[bit] = []
+                for value in range(len(line_values)):
+                    if bit in check_matrix_one_position[value] and line_values[value] == 1:
+                        reverse_dict[bit].append(True)
+                    elif bit in check_matrix_one_position[value] and line_values[value] == 0:
+                        reverse_dict[bit].append(False)
+            """            
+            print(line_values)
+            print(reverse_dict)
+            print(copy_code)
+            """
+            for z in reverse_dict.keys():
+                if False not in reverse_dict[z] and reverse_dict[z] != []:
+                    copy_code[z] = (copy_code[z] + 1) % 2
+            """
+            print(copy_code)
+            print('--------------')
+            """
+
+    errors.append(counter_error * 100 / number_of_repetitions)
+plotting(probability_of_error, errors, 'bit-flipping decoding')
+
+# TODO Продумать условие определения, когда проверки на четность выполняется, а исходный и исправленный код отличаются
+#  Места, которые продумать в коде отмечены # !!!!
