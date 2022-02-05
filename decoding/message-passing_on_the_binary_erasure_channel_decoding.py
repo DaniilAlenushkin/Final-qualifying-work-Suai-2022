@@ -1,8 +1,10 @@
 """
-В двоичном канале стирания (BEC) переданный бит либо принимается корректно, либо полностью стирается с некоторой
-вероятностью ε. Поскольку биты, которые полученные всегда полностью корректны, задача декодера состоит в том, чтобы
-определить значение неизвестных битов. Если существует уравнение проверки на четность, которое включает только один
-стертый бит правильное значение стертого бита можно определить, выбрав значение что удовлетворяет четности.
+В двоичном канале стирания (BEC) переданный бит либо принимается корректно, либо полностью
+стирается с некоторой вероятностью ε. Поскольку биты, которые полученные всегда полностью
+корректны, задача декодера состоит в том, чтобы определить значение неизвестных битов.
+Если существует уравнение проверки на четность, которое включает только один стертый бит
+правильное значение стертого бита можно определить, выбрав значение,
+что удовлетворяет четности.
 """
 from LDPC import generator_matrix, check_matrix
 from function_for_LDPC import *
@@ -11,7 +13,7 @@ from function_for_LDPC import *
 def decoding_in_binary_erasure_channel(generator_matrix, check_matrix):
     error_correction_ability_true = dict()
     error_correction_ability_false = dict()
-    signal = [randint(0, 1) for i in range(len(generator_matrix))]
+    signal = [randint(0, 1) for i in generator_matrix]
     code_signal = multiplication_vector_on_matrix(signal[:], generator_matrix[:])
     check_matrix_one_position = []
     for i in check_matrix:
@@ -56,19 +58,20 @@ def decoding_in_binary_erasure_channel(generator_matrix, check_matrix):
                             if pos_one == current_x_pos:
                                 continue
                             else:
-                                parity_check = (parity_check + copy_code[pos_one])%2
+                                parity_check = (parity_check + copy_code[pos_one]) % 2
                         copy_code[current_x_pos] = parity_check
                         if len(position_of_x) not in error_correction_ability_true.keys():
                             error_correction_ability_true[len(position_of_x)] = 0
-                        error_correction_ability_true[len(position_of_x)] = error_correction_ability_true[
-                                                                                     len(position_of_x)] + 1
+                        error_correction_ability_true[
+                            len(position_of_x)] = \
+                            error_correction_ability_true[len(position_of_x)] + 1
                         position_of_x.remove(current_x_pos)
                 if check_copy_code == copy_code:
                     counter_error += 1
                     if len(position_of_x) not in error_correction_ability_false.keys():
                         error_correction_ability_false[len(position_of_x)] = 0
-                    error_correction_ability_false[len(position_of_x)] = error_correction_ability_false[
-                                                                                 len(position_of_x)] + 1
+                    error_correction_ability_false[len(position_of_x)] = \
+                        error_correction_ability_false[len(position_of_x)] + 1
                     break
         errors.append(counter_error * 100 / number_of_repetitions)
 
@@ -76,21 +79,22 @@ def decoding_in_binary_erasure_channel(generator_matrix, check_matrix):
     for z in range(1, len(code_signal)+1):
         try:
             correct = error_correction_ability_true[z]
-        except Exception:
+        except KeyError:
             correct = 0
 
         try:
             wrong = error_correction_ability_false[z]
-        except Exception:
+        except KeyError:
             wrong = 0
 
         try:
             dict_for_correction_ability[z] = correct * 100 / (correct + wrong)
-        except Exception:
+        except ZeroDivisionError:
             dict_for_correction_ability[z] = 0
 
     for z in dict_for_correction_ability.keys():
-        print('Код исправляет', z, 'ошибку в', dict_for_correction_ability[z], '% случаях')
+        print('Код исправляет', z, 'ошибку в',
+              dict_for_correction_ability[z], '% случаях')
     title = 'в двоичном канале стирания'
     plotting(probability_of_error, errors, title)
 
