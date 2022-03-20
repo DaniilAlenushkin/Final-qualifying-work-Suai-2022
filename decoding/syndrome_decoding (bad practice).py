@@ -16,8 +16,10 @@ def correction_ability(code_signal, check_matrix):
             test = code_signal[:]
             for k in j:
                 test[k] = (test[k]+1) % 2
-            test_syndrome = multiplication_vector_on_matrix(test[:], transposition(check_matrix[:]))
-            if (test_syndrome in vector_syndrome) or (test_syndrome in test_vector_syndrome):
+            test_syndrome = \
+                multiplication_vector_on_matrix(test[:], transposition(check_matrix[:]))
+            if (test_syndrome in vector_syndrome) or \
+                    (test_syndrome in test_vector_syndrome):
                 result['i'] = i
                 return result
             test_vector_syndrome.append(test_syndrome)
@@ -49,7 +51,8 @@ def add_and_correct_errors(generator_matrix, check_matrix):
                 if prob < i:
                     copy_code[bit] = (copy_code[bit] + 1) % 2
             # Исправление ошибки
-            syndrome = multiplication_vector_on_matrix(copy_code[:], transposition(check_matrix[:]))
+            syndrome = multiplication_vector_on_matrix(copy_code[:],
+                                                       transposition(check_matrix[:]))
             if sum(syndrome) != 0:
                 if syndrome in vector_syndrome:
                     index_error = vector_syndrome.index(syndrome)
@@ -57,13 +60,16 @@ def add_and_correct_errors(generator_matrix, check_matrix):
                     for k in comb:
                         copy_code[k] = (copy_code[k] + 1) % 2
 
-                    if sum(multiplication_vector_on_matrix(copy_code[:], transposition(check_matrix[:]))) != 0:
+                    if sum(multiplication_vector_on_matrix(copy_code[:],
+                                                           transposition(
+                                                               check_matrix[:]))) != 0:
                         counter_error += 1
                 else:
                     counter_error += 1
         errors.append(counter_error*100/number_of_repetitions)
-    title = 'c использованием синдромов'
-    plotting(probability_of_error, errors, title)
+    title = 'LDPC'
+    plotting([probability_of_error], [errors], [title], 1)
+
 
 if __name__ == '__main__':
     add_and_correct_errors(generator_matrix, check_matrix)

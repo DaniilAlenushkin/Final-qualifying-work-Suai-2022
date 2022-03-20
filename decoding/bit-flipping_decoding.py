@@ -31,6 +31,7 @@ def bit_flipping(generator_matrix, check_matrix):
     error_correction_ability_false = dict()
     signal = [randint(0, 1) for i in generator_matrix]
     code_signal = multiplication_vector_on_matrix(signal[:], generator_matrix[:])
+    print(code_signal)
     check_matrix_one_position = []
     for i in check_matrix:
         check_matrix_one_position_line = []
@@ -41,19 +42,21 @@ def bit_flipping(generator_matrix, check_matrix):
                 check_matrix_one_position.append(check_matrix_one_position_line)
     errors = []
     probability_of_error = 100
-    number_of_repetitions = 1000
+    number_of_repetitions = 100
     for i in range(probability_of_error):
         counter_error = 0
 
         for j in range(number_of_repetitions):
             counter_fipping_bits = 0
             copy_code = code_signal[:]
+            index_reversed_bits = []
             # Добавление ошибки
             for bit in range(len(copy_code)):
                 prob = randint(1, 101)
                 if prob < i:
                     copy_code[bit] = (copy_code[bit] + 1) % 2
                     counter_fipping_bits += 1
+                    index_reversed_bits.append(bit)
             # Исправление ошибки
             list_of_option = []
             while True:
@@ -92,6 +95,9 @@ def bit_flipping(generator_matrix, check_matrix):
                         error_correction_ability_false[counter_fipping_bits] = \
                             error_correction_ability_false[counter_fipping_bits] + 1
                         counter_error += 1
+                        if counter_fipping_bits == 1:
+                            print(f'ПНЧ проходит без совпадения\n'
+                                  f'{copy_code}\n{index_reversed_bits}')
                         break
                 # !!!!!!!!!!!!!
                 reverse_dict = dict()
@@ -110,9 +116,6 @@ def bit_flipping(generator_matrix, check_matrix):
                         copy_code[z] = (copy_code[z] + 1) % 2
 
         errors.append(counter_error * 100 / number_of_repetitions)
-
-    print(error_correction_ability_false)
-    print(error_correction_ability_true)
     dict_for_correction_ability = dict()
     for z in range(1, len(code_signal)+1):
         try:
@@ -133,12 +136,8 @@ def bit_flipping(generator_matrix, check_matrix):
     for z in dict_for_correction_ability.keys():
         print('Код исправляет', z, 'ошибку в',
               dict_for_correction_ability[z], '% случаях')
-    plotting(probability_of_error, errors, 'bit-flipping decoding')
-
-
-# TODO Продумать условие определения, когда проверки на четность выполняется,
-#  а исходный и исправленный код отличаются Места, которые продумать в коде отмечены #
-#  !!!!
+    sg = cascade_code_solomon_and_golay()
+    plotting([probability_of_error, sg[0]], [errors, sg[1]], ['LDPC', 'golay'], 2)
 
 
 if __name__ == '__main__':

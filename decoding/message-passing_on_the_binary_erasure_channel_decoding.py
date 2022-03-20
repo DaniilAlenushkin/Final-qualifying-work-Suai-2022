@@ -95,8 +95,8 @@ def decoding_in_binary_erasure_channel(generator_matrix, check_matrix):
     for z in dict_for_correction_ability.keys():
         print('Код исправляет', z, 'ошибку в',
               dict_for_correction_ability[z], '% случаях')
-    title = 'в двоичном канале стирания'
-    plotting(probability_of_error, errors, title)
+    title = 'LDPC'
+    plotting([probability_of_error], [errors], [title], 1)
 
 
 if __name__ == '__main__':
