@@ -137,7 +137,7 @@ def bit_flipping(generator_matrix, check_matrix):
         print('Код исправляет', z, 'ошибку в',
               dict_for_correction_ability[z], '% случаях')
     sg = cascade_code_solomon_and_golay()
-    plotting([probability_of_error, sg[0]], [errors, sg[1]], ['LDPC', 'golay'], 2)
+    plotting([probability_of_error, sg[0][0], sg[1][0]], [errors, sg[0][1], sg[1][1]], ['LDPC', 'golay', 'golay+solomon'], 3)
 
 
 if __name__ == '__main__':
