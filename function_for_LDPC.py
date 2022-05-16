@@ -44,11 +44,11 @@ def transposition(x):
 
 
 # Построение графиков
-def plotting(probability_of_error, errors, legend, number_of_charts):
+def plotting(probability_of_error: int, errors: list, legend: list):
     fig, ax = plt.subplots()
     ax.set_title('Зависимость вероятности ошибки на бит от вероятности потери пакета')
-    for i in range(number_of_charts):
-        ax.plot(list(range(probability_of_error[i])), errors[i])
+    for i in range(len(errors)):
+        ax.plot(list(range(probability_of_error)), errors[i])
     ax.legend(legend)
     ax.grid()
     ax.set_xlabel('Вероятность ошибки на бит,%')
@@ -89,7 +89,27 @@ def cascade_code_solomon_and_golay(probability_of_error):
                                         ((1 - (error/100))**(24-k))) * 100
         errors_solomon_and_golay.append(packet_lost_probability)
 
-    return [[probability_of_error, errors_golay_and_solomon]]
+    return [errors_golay_and_solomon]
+
+
+def definition_matrix_from_txt(file_name):
+    with open(file_name) as f:
+        check = []
+        generator = []
+        counter_blank_lines = 0
+        for line in f:
+            list_line = []
+            for symbol in line:
+                if symbol.isdigit():
+                    list_line.append(int(symbol))
+            if not list_line:
+                counter_blank_lines += 1
+            else:
+                if counter_blank_lines in [1, 2]:
+                    check.append(list_line)
+                elif counter_blank_lines in [3, 4]:
+                    generator.append(list_line)
+    return generator, check
 
 
 if __name__ == '__main__':

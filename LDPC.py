@@ -1,32 +1,12 @@
 from function_for_LDPC import *
 
 
-def definition_matrix_from_txt():
-    with open('Matrix (4).txt') as f:
-        check = []
-        generator = []
-        counter_blank_lines = 0
-        for line in f:
-            list_line = []
-            for symbol in line:
-                if symbol.isdigit():
-                    list_line.append(int(symbol))
-            if not list_line:
-                counter_blank_lines += 1
-            else:
-                if counter_blank_lines in [1, 2]:
-                    check.append(list_line)
-                elif counter_blank_lines in [3, 4]:
-                    generator.append(list_line)
-    return generator, check
-
-
 if __name__ == '__main__':
-    generator_matrix, check_matrix = definition_matrix_from_txt()
+    generator_matrix, check_matrix = definition_matrix_from_txt('Matrix.txt')
     print(f'Строк в матрице {len(generator_matrix)}')
     print(f'Столбцов в матрице {len(generator_matrix[0])}')
     print(f'Кодовая скорость {len(generator_matrix)/len(generator_matrix[0])}')
-    for j in range(100):
+    for j in range(10):
         while True:
             signal = [randint(0, 1) for i in range(len(generator_matrix))]
             if max(signal) != 0:

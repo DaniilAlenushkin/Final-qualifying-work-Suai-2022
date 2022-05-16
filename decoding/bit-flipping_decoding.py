@@ -23,13 +23,15 @@
 """
 
 import datetime as dt
+from pathlib import Path
 
-from LDPC import definition_matrix_from_txt
 from function_for_LDPC import *
 
 
 def bit_flipping():
-    generator_matrix, check_matrix = definition_matrix_from_txt()
+    path_to_current_file = Path(__file__)
+    generator_matrix, check_matrix = \
+        definition_matrix_from_txt(path_to_current_file.parent.parent / 'Matrix.txt')
     error_correction_ability_true = dict()
     error_correction_ability_false = dict()
     signal = [randint(0, 1) for i in generator_matrix]
@@ -148,10 +150,10 @@ def bit_flipping():
         print('Код исправляет', z, 'ошибку в',
               dict_for_correction_ability[z], '% случаях')
     sg = cascade_code_solomon_and_golay(probability_of_error)
-    plotting([probability_of_error, sg[0][0], sg[1][0], sg[2][0], sg[3][0]],
-             [errors, sg[0][1], sg[1][1], sg[2][1], sg[3][1]],
-             ['LDPC', 'golay', 'golay + solomon', 'solomon', 'solomon + golay'],
-             5)
+    sg.append(errors)
+    plotting(probability_of_error,
+             sg,
+             ['LDPC', 'golay + solomon'])
 
 
 if __name__ == '__main__':
