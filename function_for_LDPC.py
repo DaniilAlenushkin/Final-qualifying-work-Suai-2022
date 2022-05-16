@@ -56,9 +56,7 @@ def plotting(probability_of_error, errors, legend, number_of_charts):
     plt.show()
 
 
-def cascade_code_solomon_and_golay():
-    probability_of_error = 100
-
+def cascade_code_solomon_and_golay(probability_of_error):
     errors_golay = []
     for p in range(probability_of_error):
         packet_lost_probability = 0
@@ -91,11 +89,8 @@ def cascade_code_solomon_and_golay():
                                         ((1 - (error/100))**(24-k))) * 100
         errors_solomon_and_golay.append(packet_lost_probability)
 
-    return [[probability_of_error, errors_golay],
-            [probability_of_error, errors_golay_and_solomon],
-            [probability_of_error, errors_solomon],
-            [probability_of_error, errors_solomon_and_golay]]
+    return [[probability_of_error, errors_golay_and_solomon]]
 
 
 if __name__ == '__main__':
-    cascade_code_solomon_and_golay()
+    cascade_code_solomon_and_golay(20)

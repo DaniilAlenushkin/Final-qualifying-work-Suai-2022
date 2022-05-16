@@ -22,11 +22,14 @@
 четности вряд ли будут содержать один и тот же набор битов кодового слова.
 """
 
-from LDPC import generator_matrix, check_matrix
+import datetime as dt
+
+from LDPC import definition_matrix_from_txt
 from function_for_LDPC import *
 
 
-def bit_flipping(generator_matrix, check_matrix):
+def bit_flipping():
+    generator_matrix, check_matrix = definition_matrix_from_txt()
     error_correction_ability_true = dict()
     error_correction_ability_false = dict()
     signal = [randint(0, 1) for i in generator_matrix]
@@ -45,9 +48,8 @@ def bit_flipping(generator_matrix, check_matrix):
     number_of_repetitions = 100
     for i in range(probability_of_error):
         counter_error = 0
-
         for j in range(number_of_repetitions):
-            counter_fipping_bits = 0
+            counter_flipping_bits = 0
             copy_code = code_signal[:]
             index_reversed_bits = []
             # Добавление ошибки
@@ -55,18 +57,21 @@ def bit_flipping(generator_matrix, check_matrix):
                 prob = randint(1, 101)
                 if prob < i:
                     copy_code[bit] = (copy_code[bit] + 1) % 2
-                    counter_fipping_bits += 1
+                    counter_flipping_bits += 1
                     index_reversed_bits.append(bit)
             # Исправление ошибки
             list_of_option = []
             while True:
-                if copy_code in list_of_option:
-                    if counter_fipping_bits not in \
+                if (copy_code in list_of_option):
+                    if counter_flipping_bits not in \
                             error_correction_ability_false.keys():
-                        error_correction_ability_false[counter_fipping_bits] = 0
-                    error_correction_ability_false[counter_fipping_bits] = \
-                        error_correction_ability_false[counter_fipping_bits] + 1
+                        error_correction_ability_false[counter_flipping_bits] = 0
+                    error_correction_ability_false[counter_flipping_bits] = \
+                        error_correction_ability_false[counter_flipping_bits] + 1
                     counter_error += 1
+                    print(f'{i} - вероятность ошибки {j + 1} - повторение\n'
+                          f'{dt.datetime.now()}\n'
+                          f'-\n')
                     break
                 list_of_option.append(copy_code[:])
                 line_values = []
@@ -82,22 +87,28 @@ def bit_flipping(generator_matrix, check_matrix):
                 # !!!!!!!!!!!!!
                 if counter_value == 0:
                     if code_signal == copy_code:
-                        if counter_fipping_bits not in \
+                        if counter_flipping_bits not in \
                                 error_correction_ability_true.keys():
-                            error_correction_ability_true[counter_fipping_bits] = 0
-                        error_correction_ability_true[counter_fipping_bits] = \
-                            error_correction_ability_true[counter_fipping_bits] + 1
+                            error_correction_ability_true[counter_flipping_bits] = 0
+                        error_correction_ability_true[counter_flipping_bits] = \
+                            error_correction_ability_true[counter_flipping_bits] + 1
+                        print(f'{i} - вероятность ошибки {j+1} - повторение\n'
+                              f'{dt.datetime.now()}\n'
+                              f'+\n')
                         break
                     else:
-                        if counter_fipping_bits not in \
+                        if counter_flipping_bits not in \
                                 error_correction_ability_false.keys():
-                            error_correction_ability_false[counter_fipping_bits] = 0
-                        error_correction_ability_false[counter_fipping_bits] = \
-                            error_correction_ability_false[counter_fipping_bits] + 1
+                            error_correction_ability_false[counter_flipping_bits] = 0
+                        error_correction_ability_false[counter_flipping_bits] = \
+                            error_correction_ability_false[counter_flipping_bits] + 1
                         counter_error += 1
-                        if counter_fipping_bits == 1:
+                        if counter_flipping_bits == 1:
                             print(f'ПНЧ проходит без совпадения\n'
                                   f'{copy_code}\n{index_reversed_bits}')
+                        print(f'{i} - вероятность ошибки {j+1} - повторение\n'
+                              f'{dt.datetime.now()}\n'
+                              f'-\n')
                         break
                 # !!!!!!!!!!!!!
                 reverse_dict = dict()
@@ -136,7 +147,7 @@ def bit_flipping(generator_matrix, check_matrix):
     for z in dict_for_correction_ability.keys():
         print('Код исправляет', z, 'ошибку в',
               dict_for_correction_ability[z], '% случаях')
-    sg = cascade_code_solomon_and_golay()
+    sg = cascade_code_solomon_and_golay(probability_of_error)
     plotting([probability_of_error, sg[0][0], sg[1][0], sg[2][0], sg[3][0]],
              [errors, sg[0][1], sg[1][1], sg[2][1], sg[3][1]],
              ['LDPC', 'golay', 'golay + solomon', 'solomon', 'solomon + golay'],
@@ -144,4 +155,4 @@ def bit_flipping(generator_matrix, check_matrix):
 
 
 if __name__ == '__main__':
-    bit_flipping(generator_matrix, check_matrix)
+    bit_flipping()
