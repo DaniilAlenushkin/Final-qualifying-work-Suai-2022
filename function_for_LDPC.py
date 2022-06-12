@@ -1,7 +1,4 @@
 from math import comb
-from itertools import combinations
-from random import randint
-
 import matplotlib.pyplot as plt
 
 
@@ -46,32 +43,34 @@ def transposition(x):
 # Построение графиков
 def plotting(probability_of_error: int, errors: list, legend: list):
     fig, ax = plt.subplots()
-    ax.set_title('Зависимость вероятности ошибки на бит от вероятности потери пакета')
+    ax.set_title('Зависимость вероятности потери информационного '
+                 'пакета от вероятности ошибки на бит')
+
     for i in range(len(errors)):
-        ax.plot(list(range(probability_of_error)), errors[i])
+        prom_rez = []
+        for j in errors[i]:
+            prom_rez.append(j/100)
+        errors[i] = prom_rez
+
+    probability_of_error_divide_by_100 = []
+    cntr = 0
+    while cntr <= probability_of_error / 100:
+        if cntr >= probability_of_error / 100:
+            break
+        else:
+            probability_of_error_divide_by_100.append(cntr)
+        cntr += 0.01
+
+    for i in range(len(errors)):
+        ax.plot(probability_of_error_divide_by_100, errors[i])
     ax.legend(legend)
     ax.grid()
-    ax.set_xlabel('Вероятность ошибки на бит,%')
-    ax.set_ylabel('Вероятность потери пакета,%')
+    ax.set_xlabel('Вероятность ошибки на бит')
+    ax.set_ylabel('Вероятность потери пакета')
     plt.show()
 
 
 def cascade_code_solomon_and_golay(probability_of_error):
-    errors_golay = []
-    for p in range(probability_of_error):
-        packet_lost_probability = 0
-        for k in range(5, 25):
-            packet_lost_probability += (comb(24, k) * ((p/100) ** k) *
-                                        ((1 - (p/100))**(24-k))) * 100
-        errors_golay.append(packet_lost_probability)
-
-    errors_golay_and_solomon = []
-    for error in errors_golay:
-        packet_lost_probability = 0
-        for k in range(12, 171):
-            packet_lost_probability += (comb(170, k) * ((error/100) ** k) *
-                                        ((1 - (error/100))**(170-k))) * 100
-        errors_golay_and_solomon.append(packet_lost_probability)
 
     errors_solomon = []
     for p in range(probability_of_error):
@@ -81,15 +80,14 @@ def cascade_code_solomon_and_golay(probability_of_error):
                                         ((1 - (p/100))**(170-k))) * 100
         errors_solomon.append(packet_lost_probability)
 
-    errors_solomon_and_golay = []
+    errors_solomon_golay = []
     for error in errors_solomon:
         packet_lost_probability = 0
         for k in range(5, 25):
             packet_lost_probability += (comb(24, k) * ((error/100) ** k) *
                                         ((1 - (error/100))**(24-k))) * 100
-        errors_solomon_and_golay.append(packet_lost_probability)
-
-    return [errors_golay_and_solomon]
+        errors_solomon_golay.append(packet_lost_probability)
+    return [errors_solomon_golay]
 
 
 def definition_matrix_from_txt(file_name):
